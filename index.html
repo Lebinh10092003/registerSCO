@@ -6,9 +6,14 @@
   <title>Form đăng ký ICO / IAIO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="//unpkg.com">
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="//provinces.open-api.vn">
+  <link rel="dns-prefetch" href="//script.google.com">
+  <link rel="dns-prefetch" href="//img.vietqr.io">
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script defer src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root {
       --bg: #f1f3f4;
@@ -408,11 +413,11 @@
       <p class="sub">Dữ liệu gửi trực tiếp về Google Sheets qua Google Apps Script.</p>
       <div class="org-list">
         <div class="org-pill">
-          <img src="https://www.schoolconnectonline.com/images/scologo.svg" alt="School Connect Olympiad">
+          <img src="https://www.schoolconnectonline.com/images/scologo.svg" alt="School Connect Olympiad" width="26" height="26" decoding="async">
           <span>School Connect Olympiad</span>
         </div>
         <div class="org-pill">
-          <img class="fermat-mark" src="http://fermat.edu.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech">
+          <img class="fermat-mark" src="https://fermat.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech" width="26" height="26" decoding="async">
           <span>Fermat Tech</span>
         </div>
       </div>
@@ -426,7 +431,7 @@
           hoặc xác nhận hồ sơ vui lòng liên hệ Ban tổ chức theo thông tin bên dưới.
         </p>
         <div class="org-head">
-          <img class="fermat-mark" src="http://fermat.edu.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech">
+          <img class="fermat-mark" src="https://fermat.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech" width="26" height="26" decoding="async">
           <span>Đơn vị tổ chức: Fermat Tech</span>
         </div>
         <div class="contact-grid">
@@ -568,7 +573,7 @@
           <p class="section-title">Chuyển khoản lệ phí</p>
           <div class="pay-card">
             <div class="qr-box">
-              <img id="bankQrImage" src="https://img.vietqr.io/image/BIDV-8670070065-compact2.png?accountName=CONG%20TY%20CO%20PHAN%20CONG%20NGHE%20FERMAT&addInfo=ICOIAIO-HOVATEN-SDT" alt="QR chuyển khoản BIDV">
+              <img id="bankQrImage" src="https://img.vietqr.io/image/BIDV-8670070065-compact2.png?accountName=CONG%20TY%20CO%20PHAN%20CONG%20NGHE%20FERMAT&addInfo=ICOIAIO-HOVATEN-SDT" alt="QR chuyển khoản BIDV" width="240" height="240" loading="lazy" decoding="async">
             </div>
             <div class="bank-info">
               <div class="bank-row"><b>Ngân hàng:</b> BIDV - Chi nhánh Ngọc Khánh Hà Nội</div>
@@ -630,15 +635,22 @@
     const WARDS_CACHE_PREFIX = "fermat_wards_v2_";
     const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
     const WARD_PREFETCH_MAX = 12;
+    const QR_UPDATE_DEBOUNCE_MS = 220;
     const FORM_DRAFT_KEY = "fermat_registration_draft_v1";
     const GUARDIAN_PREFILL_KEY = "fermat_registration_guardian_v1";
     const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
     const BANK_BIN = "BIDV";
     const BANK_ACCOUNT = "8670070065";
     const BANK_ACCOUNT_NAME = "CONG TY CO PHAN CONG NGHE FERMAT";
+    const CONNECTION = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+    const IS_SAVE_DATA = Boolean(CONNECTION && CONNECTION.saveData);
+    const IS_SLOW_CONNECTION = Boolean(CONNECTION && /(^|-)2g|slow-2g/i.test(String(CONNECTION.effectiveType || "")));
+    const PREFETCH_WARD_LIMIT = IS_SAVE_DATA ? 0 : (IS_SLOW_CONNECTION ? 4 : WARD_PREFETCH_MAX);
     let wardPrefetchStarted = false;
     let isRestoringDraft = false;
     let saveDraftTimer = null;
+    let qrUpdateTimer = null;
+    let lastQrSrc = bankQrImage.getAttribute("src") || "";
 
     function initClassOptions() {
       const studentClass = document.getElementById("studentClass");
@@ -799,8 +811,20 @@
       if (Number.isFinite(amount) && amount > 0) {
         params.set("amount", String(Math.round(amount)));
       }
-      bankQrImage.src = `https://img.vietqr.io/image/${BANK_BIN}-${BANK_ACCOUNT}-compact2.png?${params.toString()}`;
+      const nextQrSrc = `https://img.vietqr.io/image/${BANK_BIN}-${BANK_ACCOUNT}-compact2.png?${params.toString()}`;
+      if (nextQrSrc !== lastQrSrc) {
+        bankQrImage.src = nextQrSrc;
+        lastQrSrc = nextQrSrc;
+      }
       transferContentText.textContent = addInfo;
+    }
+
+    function scheduleUpdateBankQr(delayMs = QR_UPDATE_DEBOUNCE_MS) {
+      clearTimeout(qrUpdateTimer);
+      qrUpdateTimer = setTimeout(() => {
+        qrUpdateTimer = null;
+        updateBankQr();
+      }, delayMs);
     }
 
     function readDraftState() {
@@ -863,7 +887,7 @@
     function scheduleSaveDraftState() {
       if (isRestoringDraft) return;
       clearTimeout(saveDraftTimer);
-      saveDraftTimer = setTimeout(saveDraftState, 180);
+      saveDraftTimer = setTimeout(saveDraftState, 260);
     }
 
     async function restoreDraftState() {
@@ -1040,11 +1064,16 @@
 
     function prefetchWardsGradually(provinces) {
       if (wardPrefetchStarted) return;
+      if (!Array.isArray(provinces) || !provinces.length) return;
+      if (PREFETCH_WARD_LIMIT <= 0) return;
       wardPrefetchStarted = true;
 
       const priority = ["79", "1", "31", "48", "92", "46"];
       const codes = provinces.map((x) => String(x.code || "").trim()).filter(Boolean);
-      const queue = [...new Set([...priority.filter((x) => codes.includes(x)), ...codes])].slice(0, WARD_PREFETCH_MAX);
+      const queue = [...new Set([...priority.filter((x) => codes.includes(x)), ...codes])].slice(0, PREFETCH_WARD_LIMIT);
+      if (!queue.length) return;
+      const stepDelay = IS_SLOW_CONNECTION ? 420 : 180;
+      const firstDelay = IS_SLOW_CONNECTION ? 900 : 400;
 
       let idx = 0;
       const step = async () => {
@@ -1058,13 +1087,17 @@
             if (wards.length) writeCache(key, wards);
           } catch (_) {}
         }
-        setTimeout(step, 180);
+        setTimeout(step, stepDelay);
       };
-      setTimeout(step, 400);
+      setTimeout(step, firstDelay);
     }
 
     function warmUpAppsScript() {
-      fetch(`${APPS_SCRIPT_URL}?warmup=1`).catch(() => {});
+      if (IS_SAVE_DATA) return;
+      const warmupDelay = IS_SLOW_CONNECTION ? 2400 : 1200;
+      setTimeout(() => {
+        fetch(`${APPS_SCRIPT_URL}?warmup=1`).catch(() => {});
+      }, warmupDelay);
     }
 
     async function swapHtmlInto(targetSelector, url) {
@@ -1252,23 +1285,23 @@
     });
     competitionSelect.addEventListener("change", () => {
       syncPaidAmountByCompetition();
-      updateBankQr();
+      scheduleUpdateBankQr(0);
       scheduleSaveDraftState();
     });
     fullNameInput.addEventListener("input", () => {
-      updateBankQr();
+      scheduleUpdateBankQr();
       scheduleSaveDraftState();
     });
     phoneInput.addEventListener("input", () => {
-      updateBankQr();
+      scheduleUpdateBankQr();
       scheduleSaveDraftState();
     });
     paidAmountInput.addEventListener("input", () => {
-      updateBankQr();
+      scheduleUpdateBankQr();
       scheduleSaveDraftState();
     });
     paymentRefInput.addEventListener("input", () => {
-      updateBankQr();
+      scheduleUpdateBankQr();
       scheduleSaveDraftState();
     });
     feeStatusPaidInput.addEventListener("change", () => {
@@ -1341,10 +1374,18 @@
       try {
         const guardianEmailSnapshot = emailInput.value.trim();
         const guardianPhoneSnapshot = phoneInput.value.trim();
-        const res = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          body: new URLSearchParams(payload)
-        });
+        const submitController = new AbortController();
+        const submitTimeout = setTimeout(() => submitController.abort(), 30000);
+        let res;
+        try {
+          res = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            body: new URLSearchParams(payload),
+            signal: submitController.signal
+          });
+        } finally {
+          clearTimeout(submitTimeout);
+        }
         const text = await res.text();
         let data = {};
         try {
@@ -1386,8 +1427,11 @@
         saveDraftState();
       } catch (err) {
         const rawMsg = String(err && err.message ? err.message : "");
+        const aborted = err && err.name === "AbortError";
         const networkLike = /failed to fetch|networkerror|network request failed/i.test(rawMsg);
-        const msg = networkLike
+        const msg = aborted
+          ? "Không nhận được phản hồi từ Apps Script sau 30 giây. Vui lòng thử lại."
+          : networkLike
           ? "Không kết nối được Apps Script. Kiểm tra lại URL deploy, quyền truy cập Web App (Anyone), và redeploy version mới."
           : (rawMsg || "Lỗi hệ thống. Vui lòng liên hệ BTC qua Zalo OA hoặc các trang thông tin!");
         showAlert("error", "Không thể gửi đăng ký", msg);
