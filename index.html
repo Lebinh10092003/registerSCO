@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form đăng ký ICO / IAIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      --bg: #f1f3f4;
+      --card: #ffffff;
+      --line: #d7dce3;
+      --text: #202124;
+      --muted: #5f6368;
+      --brand: #1a73e8;
+      --ok: #137333;
+      --err: #c5221f;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Be Vietnam Pro", sans-serif;
+      padding: 16px 10px 36px;
+    }
+
+    .form-shell {
+      width: min(760px, 100%);
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #e4e7ec;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 10px rgba(60, 64, 67, 0.1);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .title-card {
+      border-top: 10px solid var(--brand);
+      padding: 18px 16px 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.25rem, 4.4vw, 1.65rem);
+      line-height: 1.3;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .org-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .org-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 4px 10px;
+      border: 1px solid #d5dde8;
+      border-radius: 999px;
+      background: #f8fbff;
+      font-size: 0.83rem;
+      color: #3c4043;
+      font-weight: 600;
+    }
+
+    .org-pill img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .fermat-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1px solid #d5dde8;
+      background: #fff;
+      object-fit: contain;
+      flex: 0 0 26px;
+      display: inline-block;
+    }
+
+    .info-card {
+      padding: 16px;
+    }
+
+    .event-sub {
+      margin: 0 0 10px;
+      font-size: 0.9rem;
+      color: #374151;
+      line-height: 1.45;
+    }
+
+    .org-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #1f2937;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    @media (min-width: 720px) {
+      .contact-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .contact-row {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #2d3643;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .contact-row b {
+      color: #111827;
+    }
+
+    .contact-row a {
+      color: #174ea6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .contact-row a:hover,
+    .contact-row a:focus-visible {
+      text-decoration: underline;
+    }
+
+    form {
+      padding: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      color: #174ea6;
+      font-weight: 700;
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 700px) {
+      .grid.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #c8d0da;
+      border-radius: 10px;
+      background: #fff;
+      color: #1f2937;
+      min-height: 42px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid #c2dbff;
+      border-color: #8cb6f7;
+    }
+
+    .auto-readonly {
+      background: #f5f7fa;
+      color: #1f2937;
+      font-weight: 700;
+      cursor: not-allowed;
+    }
+
+    .field-note {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #5f6368;
+    }
+
+    .check-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      border: 1px solid #c8d0da;
+      border-radius: 10px;
+      background: #fff;
+      padding: 0 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1f2937;
+      cursor: pointer;
+    }
+
+    .check-line input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-height: 0;
+      margin: 0;
+      accent-color: #1a73e8;
+      cursor: pointer;
+    }
+
+    .inline {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dob-wrap {
+      position: relative;
+    }
+
+    .dob-picker-btn {
+      min-width: 74px;
+      white-space: nowrap;
+    }
+
+    .dob-picker-native {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      left: 0;
+      top: 0;
+    }
+
+    .toggle-btn {
+      min-height: 42px;
+      border: 1px solid #c8d0da;
+      border-radius: 10px;
+      background: #fff;
+      color: #1f2937;
+      padding: 0 12px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .error {
+      min-height: 16px;
+      margin-top: 4px;
+      color: var(--err);
+      font-size: 0.78rem;
+    }
+
+    .pay-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    @media (min-width: 720px) {
+      .pay-card {
+        grid-template-columns: 240px 1fr;
+      }
+    }
+
+    .qr-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+      width: 100%;
+      max-width: 240px;
+      margin: 0 auto;
+    }
+
+    .qr-box img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      object-fit: cover;
+      aspect-ratio: 1 / 1;
+      background: #f5f7fa;
+    }
+
+    .bank-info {
+      font-size: 0.9rem;
+      color: #2d3643;
+      line-height: 1.45;
+    }
+
+    .bank-info b {
+      color: #111827;
+    }
+
+    .bank-row {
+      margin-bottom: 6px;
+    }
+
+    .bank-note {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #eef5ff;
+      border: 1px solid #d6e6ff;
+      font-size: 0.86rem;
+    }
+
+    .submit-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    #submitBtn {
+      border: 0;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      min-height: 44px;
+      padding: 0 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #submitBtn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #formMessage {
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    #formMessage.ok {
+      color: var(--ok);
+    }
+
+    #formMessage.err {
+      color: var(--err);
+    }
+  </style>
+</head>
+<body>
+  <div class="form-shell">
+    <div id="htmxNoHeadersSource" hx-request='{"noHeaders":true}' style="display:none;" aria-hidden="true"></div>
+    <section class="card title-card">
+      <h1>Form đăng ký ICO / IAIO</h1>
+      <p class="sub">Dữ liệu gửi trực tiếp về Google Sheets qua Google Apps Script.</p>
+      <div class="org-list">
+        <div class="org-pill">
+          <img src="https://www.schoolconnectonline.com/images/scologo.svg" alt="School Connect Olympiad">
+          <span>School Connect Olympiad</span>
+        </div>
+        <div class="org-pill">
+          <img class="fermat-mark" src="http://fermat.edu.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech">
+          <span>Fermat Tech</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card info-card">
+      <div class="group" style="margin-bottom: 0;">
+        <p class="section-title">Thông tin kỳ thi &amp; Liên hệ BTC</p>
+        <p class="event-sub">
+          Kỳ thi ICO/IAIO dành cho học sinh phổ thông trên toàn quốc. Mọi thắc mắc về đăng ký, lệ phí
+          hoặc xác nhận hồ sơ vui lòng liên hệ Ban tổ chức theo thông tin bên dưới.
+        </p>
+        <div class="org-head">
+          <img class="fermat-mark" src="http://fermat.edu.vn/UploadFile/Images/2025/8/18/Hinh_anh_638911101534359159.png" alt="Fermat Tech">
+          <span>Đơn vị tổ chức: Fermat Tech</span>
+        </div>
+        <div class="contact-grid">
+          <p class="contact-row"><b>Zalo OA:</b> <a href="https://zalo.me/fermattech" target="_blank" rel="noopener noreferrer">https://zalo.me/fermattech</a></p>
+          <p class="contact-row"><b>Hotline:</b> <a href="tel:0969627162">0969 627 162</a></p>
+          <p class="contact-row"><b>Email:</b> <a href="mailto:contact@fermat.vn">contact@fermat.vn</a></p>
+          <p class="contact-row"><b>Website:</b> <a href="https://fermat.vn/" target="_blank" rel="noopener noreferrer">https://fermat.vn/</a></p>
+          <p class="contact-row"><b>Fanpage IAIO Việt Nam:</b> <a href="https://fb.com/IAIOVietnam" target="_blank" rel="noopener noreferrer">https://fb.com/IAIOVietnam</a></p>
+          <p class="contact-row"><b>Fanpage ICO Việt Nam:</b> <a href="https://fb.com/ICOVietnam2026" target="_blank" rel="noopener noreferrer">https://fb.com/ICOVietnam2026</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <form id="registrationForm" novalidate>
+        <div class="group">
+          <p class="section-title">Thông tin cuộc thi</p>
+          <div class="grid two">
+            <div>
+              <label for="competition">Đăng ký thi</label>
+              <select id="competition" name="competition" required>
+                <option value="">-- Chọn --</option>
+                <option value="ICO">ICO</option>
+                <option value="IAIO">IAIO</option>
+                <option value="ICO + IAIO">Cả hai</option>
+              </select>
+            </div>
+            <div>
+              <label for="examBlock">Khối thi</label>
+              <select id="examBlock" name="examBlock" required>
+                <option value="">-- Chọn --</option>
+                <option value="Khối 1-5">Khối 1-5</option>
+                <option value="Khối 6-9">Khối 6-9</option>
+                <option value="Khối 10-12">Khối 10-12</option>
+              </select>
+            </div>
+            <div>
+              <label for="studentClass">Học sinh lớp</label>
+              <select id="studentClass" name="studentClass" required></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="section-title">Thông tin thí sinh</p>
+          <div class="grid two">
+            <div>
+              <label for="fullName">Họ và tên</label>
+              <input id="fullName" name="fullName" type="text" required>
+            </div>
+            <div>
+              <label for="dob">Ngày sinh</label>
+              <div class="dob-wrap">
+                <div class="inline">
+                  <input id="dob" name="dob" type="text" inputmode="numeric" maxlength="10" placeholder="dd/mm/yyyy" required>
+                  <button class="toggle-btn dob-picker-btn" type="button" id="openDobPicker">Lịch</button>
+                </div>
+                <input id="dobPicker" class="dob-picker-native" type="date" tabindex="-1" aria-hidden="true">
+              </div>
+              <div class="field-note">Bạn có thể gõ tay dạng dd/mm/yyyy hoặc bấm nút Lịch để chọn nhanh.</div>
+              <div class="error" id="dobError"></div>
+            </div>
+            <div>
+              <label for="cccd">Số CCCD (12 số)</label>
+              <div class="inline">
+                <input id="cccd" name="cccd" type="password" inputmode="numeric" maxlength="12" autocomplete="off" required>
+                <button class="toggle-btn" type="button" id="toggleCccd">Hiện</button>
+              </div>
+              <div class="error" id="cccdError"></div>
+            </div>
+            <div>
+              <label for="homeAddress">Địa chỉ</label>
+              <textarea id="homeAddress" name="homeAddress" required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="section-title">Thông tin trường học</p>
+          <div class="grid two">
+            <div>
+              <label for="provinceSelect">Tỉnh/Thành phố</label>
+              <select id="provinceSelect" required>
+                <option value="">Đang tải tỉnh/thành...</option>
+              </select>
+              <input id="province" name="province" type="hidden">
+              <input id="provinceCode" name="provinceCode" type="hidden">
+            </div>
+            <div>
+              <label for="wardSelect">Xã/Phường</label>
+              <select id="wardSelect" required disabled>
+                <option value="">Chọn tỉnh/thành trước</option>
+              </select>
+              <input id="ward" name="ward" type="hidden">
+              <input id="wardCode" name="wardCode" type="hidden">
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label for="schoolName">Trường</label>
+              <input id="schoolName" name="schoolName" type="text" placeholder="Trường TH/THCS/THPT XXX" required>
+              <input id="schoolSource" name="schoolSource" type="hidden" value="manual">
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="section-title">Liên hệ và lệ phí</p>
+          <div class="grid two">
+            <div>
+              <label for="email">Email phụ huynh/thí sinh</label>
+              <input id="email" name="email" type="email" required>
+              <div class="error" id="emailError"></div>
+            </div>
+            <div>
+              <label for="guardianPhone">SĐT người giám hộ</label>
+              <input id="guardianPhone" name="guardianPhone" type="tel" inputmode="numeric" maxlength="12" required>
+              <div class="error" id="phoneError"></div>
+            </div>
+            <div>
+              <label for="paidAmount">Số tiền đã nộp (VND)</label>
+              <input id="paidAmount" class="auto-readonly" name="paidAmount" type="number" min="0" step="1000" value="0" readonly required>
+              <div class="field-note">Tự động theo lựa chọn kỳ thi: 350.000 VND hoặc 700.000 VND.</div>
+            </div>
+            <div>
+              <label for="feeStatus">Tình trạng nộp lệ phí</label>
+              <label class="check-line" for="feeStatusPaid">
+                <input id="feeStatusPaid" type="checkbox">
+                <span>Đã đóng lệ phí</span>
+              </label>
+              <input id="feeStatus" name="feeStatus" type="hidden" value="Chưa nộp">
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label for="paymentRef">Mã giao dịch chuyển khoản (nếu có)</label>
+              <input id="paymentRef" name="paymentRef" type="text" placeholder="VD: FT2026-ABC123">
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="section-title">Chuyển khoản lệ phí</p>
+          <div class="pay-card">
+            <div class="qr-box">
+              <img id="bankQrImage" src="https://img.vietqr.io/image/BIDV-8670070065-compact2.png?accountName=CONG%20TY%20CO%20PHAN%20CONG%20NGHE%20FERMAT&addInfo=ICOIAIO-HOVATEN-SDT" alt="QR chuyển khoản BIDV">
+            </div>
+            <div class="bank-info">
+              <div class="bank-row"><b>Ngân hàng:</b> BIDV - Chi nhánh Ngọc Khánh Hà Nội</div>
+              <div class="bank-row"><b>Số tài khoản:</b> 8670070065</div>
+              <div class="bank-row"><b>Chủ tài khoản:</b> CÔNG TY CỔ PHẦN CÔNG NGHỆ FERMAT</div>
+              <div class="bank-row"><b>Nội dung CK gợi ý:</b> <span id="transferContentText">ICOIAIO-HOVATEN-SDT</span></div>
+              <div class="bank-note">
+                QR sẽ tự cập nhật theo thông tin nhập (họ tên/SĐT/mã giao dịch). Sau khi chuyển khoản, chọn trạng thái <b>Đã nộp</b>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button id="submitBtn" type="submit">Gửi đăng ký</button>
+          <span id="formMessage" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR65VPSa70yzjMHiHtj3mQzLbMYHtMifuPgYj6KjD65srUclnPHhouSi6r2xLQE-XN/exec";
+
+    const cccdRegex = /^\d{12}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^(0\d{9}|\+84\d{9})$/;
+    const dobRegex = /^(0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+
+    const form = document.getElementById("registrationForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const formMessage = document.getElementById("formMessage");
+    const competitionSelect = document.getElementById("competition");
+    const cccdInput = document.getElementById("cccd");
+    const emailInput = document.getElementById("email");
+    const phoneInput = document.getElementById("guardianPhone");
+    const fullNameInput = document.getElementById("fullName");
+    const dobInput = document.getElementById("dob");
+    const dobPickerInput = document.getElementById("dobPicker");
+    const openDobPickerBtn = document.getElementById("openDobPicker");
+    const paidAmountInput = document.getElementById("paidAmount");
+    const feeStatusInput = document.getElementById("feeStatus");
+    const feeStatusPaidInput = document.getElementById("feeStatusPaid");
+    const paymentRefInput = document.getElementById("paymentRef");
+    const toggleCccd = document.getElementById("toggleCccd");
+    const provinceSelect = document.getElementById("provinceSelect");
+    const wardSelect = document.getElementById("wardSelect");
+    const provinceInput = document.getElementById("province");
+    const provinceCodeInput = document.getElementById("provinceCode");
+    const wardInput = document.getElementById("ward");
+    const wardCodeInput = document.getElementById("wardCode");
+    const schoolNameInput = document.getElementById("schoolName");
+    const schoolSourceInput = document.getElementById("schoolSource");
+    const htmxNoHeadersSource = document.getElementById("htmxNoHeadersSource");
+    const bankQrImage = document.getElementById("bankQrImage");
+    const transferContentText = document.getElementById("transferContentText");
+    const PROVINCES_API_BASE = "https://provinces.open-api.vn/api/v2";
+    const PROVINCES_CACHE_KEY = "fermat_provinces_v2";
+    const WARDS_CACHE_PREFIX = "fermat_wards_v2_";
+    const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    const WARD_PREFETCH_MAX = 12;
+    const FORM_DRAFT_KEY = "fermat_registration_draft_v1";
+    const GUARDIAN_PREFILL_KEY = "fermat_registration_guardian_v1";
+    const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    const BANK_BIN = "BIDV";
+    const BANK_ACCOUNT = "8670070065";
+    const BANK_ACCOUNT_NAME = "CONG TY CO PHAN CONG NGHE FERMAT";
+    let wardPrefetchStarted = false;
+    let isRestoringDraft = false;
+    let saveDraftTimer = null;
+
+    function initClassOptions() {
+      const studentClass = document.getElementById("studentClass");
+      studentClass.innerHTML = "<option value=''>-- Chọn --</option>";
+      for (let i = 1; i <= 12; i += 1) {
+        const op = document.createElement("option");
+        op.value = `Lớp ${i}`;
+        op.textContent = `Lớp ${i}`;
+        studentClass.appendChild(op);
+      }
+    }
+
+    function normalizeDob(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const [year, month, day] = raw.split("-");
+        return normalizeDob(`${day}/${month}/${year}`);
+      }
+
+      const unified = raw.replace(/[.\-\s]+/g, "/");
+      if (!dobRegex.test(unified)) return "";
+
+      const [dayStr, monthStr, yearStr] = unified.split("/");
+      const day = Number(dayStr);
+      const month = Number(monthStr);
+      const year = Number(yearStr);
+      const nowYear = new Date().getFullYear();
+      if (year < 1900 || year > nowYear) return "";
+
+      const check = new Date(year, month - 1, day);
+      const isValidDate = check.getFullYear() === year && check.getMonth() === month - 1 && check.getDate() === day;
+      if (!isValidDate) return "";
+
+      return `${String(day).padStart(2, "0")}/${String(month).padStart(2, "0")}/${year}`;
+    }
+
+    function toDdMmYyyy(value) {
+      return normalizeDob(value);
+    }
+
+    function toDateInputValue(value) {
+      const normalized = normalizeDob(value);
+      if (!normalized) return "";
+      const [day, month, year] = normalized.split("/");
+      return `${year}-${month}-${day}`;
+    }
+
+    function normalizeDobFromTyping(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const normalized = normalizeDob(raw);
+      if (normalized) return normalized;
+
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length === 8) {
+        return normalizeDob(`${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`) || "";
+      }
+      return "";
+    }
+
+    function setError(id, msg) {
+      document.getElementById(id).textContent = msg || "";
+    }
+
+    function setFormMessage(msg, type) {
+      formMessage.className = type || "";
+      formMessage.textContent = msg || "";
+    }
+
+    function showAlert(type, title, message) {
+      if (!message) return;
+      if (window.Swal && typeof window.Swal.fire === "function") {
+        window.Swal.fire({
+          icon: type,
+          title,
+          text: message,
+          confirmButtonText: "Đóng",
+          confirmButtonColor: "#1a73e8"
+        });
+        return;
+      }
+      setFormMessage(message, type === "success" ? "ok" : "err");
+    }
+
+    function setProvinceHiddenFromSelect() {
+      const selected = provinceSelect.selectedOptions[0];
+      provinceCodeInput.value = provinceSelect.value.trim();
+      provinceInput.value = selected && provinceSelect.value ? (selected.dataset.name || selected.textContent || "").trim() : "";
+    }
+
+    function setWardHiddenFromSelect() {
+      const selected = wardSelect.selectedOptions[0];
+      wardCodeInput.value = wardSelect.value.trim();
+      wardInput.value = selected && wardSelect.value ? (selected.dataset.name || selected.textContent || "").trim() : "";
+    }
+
+    function toAsciiUpper(value) {
+      return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toUpperCase();
+    }
+
+    function getCompetitionCode(value) {
+      const v = String(value || "").trim();
+      if (v === "ICO") return "ICO";
+      if (v === "IAIO") return "IAIO";
+      if (v === "ICO + IAIO") return "CAHAI";
+      return "DANGKY";
+    }
+
+    function getExpectedAmount(value) {
+      const v = String(value || "").trim();
+      if (v === "ICO" || v === "IAIO") return 350000;
+      if (v === "ICO + IAIO") return 700000;
+      return 0;
+    }
+
+    function syncPaidAmountByCompetition() {
+      const amount = getExpectedAmount(competitionSelect.value);
+      if (amount > 0) {
+        paidAmountInput.value = String(amount);
+      } else {
+        paidAmountInput.value = "0";
+      }
+      if (!isRestoringDraft) {
+        scheduleSaveDraftState();
+      }
+    }
+
+    function syncFeeStatusFromCheckbox() {
+      feeStatusInput.value = feeStatusPaidInput.checked ? "Đã nộp" : "Chưa nộp";
+    }
+
+    function buildTransferContent() {
+      const examCode = getCompetitionCode(competitionSelect.value);
+      const paymentRef = toAsciiUpper(paymentRefInput.value).replace(/[^A-Z0-9]/g, "");
+      if (paymentRef) {
+        return `${examCode}-${paymentRef}`.slice(0, 48);
+      }
+
+      const nameToken = toAsciiUpper(fullNameInput.value).replace(/[^A-Z0-9]/g, "").slice(0, 18) || "HOVATEN";
+      const phoneToken = phoneInput.value.replace(/\D/g, "").slice(-10) || "SDT";
+      return `${examCode}-${nameToken}-${phoneToken}`.slice(0, 48);
+    }
+
+    function updateBankQr() {
+      const addInfo = buildTransferContent();
+      const amount = Number(paidAmountInput.value);
+      const params = new URLSearchParams({
+        accountName: BANK_ACCOUNT_NAME,
+        addInfo
+      });
+      if (Number.isFinite(amount) && amount > 0) {
+        params.set("amount", String(Math.round(amount)));
+      }
+      bankQrImage.src = `https://img.vietqr.io/image/${BANK_BIN}-${BANK_ACCOUNT}-compact2.png?${params.toString()}`;
+      transferContentText.textContent = addInfo;
+    }
+
+    function readDraftState() {
+      const data = readStorageObject(FORM_DRAFT_KEY, DRAFT_TTL_MS);
+      return data && data.draft ? data.draft : null;
+    }
+
+    function saveGuardianPrefill(emailValue = emailInput.value, phoneValue = phoneInput.value) {
+      const email = String(emailValue || "").trim();
+      const guardianPhone = String(phoneValue || "").trim();
+      if (!email && !guardianPhone) return;
+      writeStorageObject(GUARDIAN_PREFILL_KEY, {
+        email,
+        guardianPhone
+      });
+    }
+
+    function readGuardianPrefill() {
+      const data = readStorageObject(GUARDIAN_PREFILL_KEY, DRAFT_TTL_MS);
+      if (!data) return null;
+      return {
+        email: String(data.email || "").trim(),
+        guardianPhone: String(data.guardianPhone || "").trim()
+      };
+    }
+
+    function collectDraftState() {
+      syncFeeStatusFromCheckbox();
+      return {
+        competition: competitionSelect.value,
+        examBlock: document.getElementById("examBlock").value,
+        studentClass: document.getElementById("studentClass").value,
+        fullName: fullNameInput.value,
+        dob: document.getElementById("dob").value,
+        cccd: cccdInput.value,
+        homeAddress: document.getElementById("homeAddress").value,
+        provinceCode: provinceCodeInput.value,
+        province: provinceInput.value,
+        wardCode: wardCodeInput.value,
+        ward: wardInput.value,
+        schoolName: schoolNameInput.value,
+        schoolSource: schoolSourceInput.value || "manual",
+        email: emailInput.value,
+        guardianPhone: phoneInput.value,
+        feeStatus: feeStatusInput.value,
+        paymentRef: paymentRefInput.value
+      };
+    }
+
+    function saveDraftState() {
+      if (isRestoringDraft) return;
+      setProvinceHiddenFromSelect();
+      setWardHiddenFromSelect();
+      writeStorageObject(FORM_DRAFT_KEY, {
+        draft: collectDraftState()
+      });
+      saveGuardianPrefill();
+    }
+
+    function scheduleSaveDraftState() {
+      if (isRestoringDraft) return;
+      clearTimeout(saveDraftTimer);
+      saveDraftTimer = setTimeout(saveDraftState, 180);
+    }
+
+    async function restoreDraftState() {
+      const draft = readDraftState();
+      const fallbackGuardian = readGuardianPrefill();
+
+      if (!draft && !fallbackGuardian) return;
+      isRestoringDraft = true;
+
+      if (draft) {
+        competitionSelect.value = draft.competition || "";
+        document.getElementById("examBlock").value = draft.examBlock || "";
+        document.getElementById("studentClass").value = draft.studentClass || "";
+        fullNameInput.value = draft.fullName || "";
+        const restoredDob = normalizeDobFromTyping(draft.dob) || String(draft.dob || "").trim();
+        dobInput.value = restoredDob;
+        dobPickerInput.value = toDateInputValue(restoredDob);
+        cccdInput.value = draft.cccd || "";
+        document.getElementById("homeAddress").value = draft.homeAddress || "";
+        schoolNameInput.value = draft.schoolName || "";
+        schoolSourceInput.value = draft.schoolSource || "manual";
+        emailInput.value = draft.email || "";
+        phoneInput.value = draft.guardianPhone || "";
+        feeStatusInput.value = draft.feeStatus || "Chưa nộp";
+        feeStatusPaidInput.checked = feeStatusInput.value === "Đã nộp";
+        paymentRefInput.value = draft.paymentRef || "";
+
+        syncPaidAmountByCompetition();
+        updateBankQr();
+
+        if (draft.provinceCode) {
+          provinceSelect.value = draft.provinceCode;
+          setProvinceHiddenFromSelect();
+          await loadWards(draft.provinceCode);
+          if (draft.wardCode) {
+            wardSelect.value = draft.wardCode;
+            setWardHiddenFromSelect();
+          }
+          if (!provinceInput.value && draft.province) provinceInput.value = draft.province;
+          if (!wardInput.value && draft.ward) wardInput.value = draft.ward;
+        }
+      } else if (fallbackGuardian) {
+        emailInput.value = fallbackGuardian.email || "";
+        phoneInput.value = fallbackGuardian.guardianPhone || "";
+      }
+
+      isRestoringDraft = false;
+      saveDraftState();
+    }
+
+    function clearDraftAfterSubmitKeepGuardian(emailValue, phoneValue) {
+      try {
+        localStorage.removeItem(FORM_DRAFT_KEY);
+      } catch (_) {}
+      saveGuardianPrefill(emailValue, phoneValue);
+    }
+
+    function escHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function escAttr(value) {
+      return escHtml(value).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function readCache(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.items)) return null;
+        if (Date.now() - Number(parsed.savedAt || 0) > CACHE_TTL_MS) return null;
+        return parsed.items;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function writeCache(key, items) {
+      try {
+        localStorage.setItem(key, JSON.stringify({
+          savedAt: Date.now(),
+          items
+        }));
+      } catch (_) {}
+    }
+
+    function readStorageObject(key, ttlMs) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return null;
+        if (ttlMs && Date.now() - Number(data.savedAt || 0) > ttlMs) return null;
+        return data;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function writeStorageObject(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify({
+          savedAt: Date.now(),
+          ...value
+        }));
+      } catch (_) {}
+    }
+
+    function toOptionsHtml(items, placeholder) {
+      const rows = [`<option value="">${escHtml(placeholder)}</option>`];
+      items.forEach((item) => {
+        const code = String(item.code || "").trim();
+        const name = String(item.name || "").trim();
+        if (!code || !name) return;
+        rows.push(`<option value="${escAttr(code)}" data-name="${escAttr(name)}">${escHtml(name)}</option>`);
+      });
+      return rows.join("");
+    }
+
+    function renderProvinceOptions(items) {
+      const sorted = [...items].sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "vi"));
+      provinceSelect.innerHTML = toOptionsHtml(sorted, "-- Chọn tỉnh/thành --");
+    }
+
+    function renderWardOptions(items) {
+      const sorted = [...items].sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "vi"));
+      wardSelect.innerHTML = toOptionsHtml(sorted, "-- Chọn xã/phường --");
+    }
+
+    async function fetchJsonWithTimeout(url, timeoutMs = 12000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    async function fetchProvincesFast() {
+      const rows = await fetchJsonWithTimeout(`${PROVINCES_API_BASE}/p/`);
+      if (!Array.isArray(rows)) return [];
+      return rows.map((x) => ({
+        code: String(x.code || "").trim(),
+        name: String(x.name || "").trim()
+      })).filter((x) => x.code && x.name);
+    }
+
+    async function fetchWardsFast(provinceCode) {
+      const data = await fetchJsonWithTimeout(`${PROVINCES_API_BASE}/p/${encodeURIComponent(provinceCode)}?depth=2`);
+      const wards = Array.isArray(data && data.wards) ? data.wards : [];
+      return wards.map((x) => ({
+        code: String(x.code || "").trim(),
+        name: String(x.name || "").trim()
+      })).filter((x) => x.code && x.name);
+    }
+
+    async function refreshProvincesInBackground() {
+      try {
+        const fresh = await fetchProvincesFast();
+        if (!fresh.length) return;
+        writeCache(PROVINCES_CACHE_KEY, fresh);
+        if (!provinceCodeInput.value.trim() && document.activeElement !== provinceSelect) {
+          renderProvinceOptions(fresh);
+        }
+      } catch (_) {}
+    }
+
+    function prefetchWardsGradually(provinces) {
+      if (wardPrefetchStarted) return;
+      wardPrefetchStarted = true;
+
+      const priority = ["79", "1", "31", "48", "92", "46"];
+      const codes = provinces.map((x) => String(x.code || "").trim()).filter(Boolean);
+      const queue = [...new Set([...priority.filter((x) => codes.includes(x)), ...codes])].slice(0, WARD_PREFETCH_MAX);
+
+      let idx = 0;
+      const step = async () => {
+        if (idx >= queue.length) return;
+        const code = queue[idx];
+        idx += 1;
+        const key = `${WARDS_CACHE_PREFIX}${code}`;
+        if (!readCache(key)) {
+          try {
+            const wards = await fetchWardsFast(code);
+            if (wards.length) writeCache(key, wards);
+          } catch (_) {}
+        }
+        setTimeout(step, 180);
+      };
+      setTimeout(step, 400);
+    }
+
+    function warmUpAppsScript() {
+      fetch(`${APPS_SCRIPT_URL}?warmup=1`).catch(() => {});
+    }
+
+    async function swapHtmlInto(targetSelector, url) {
+      if (window.htmx && typeof window.htmx.ajax === "function") {
+        await window.htmx.ajax("GET", url, {
+          source: htmxNoHeadersSource,
+          target: targetSelector,
+          swap: "innerHTML"
+        });
+        return;
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Không tải được dữ liệu.");
+      const html = await res.text();
+      document.querySelector(targetSelector).innerHTML = html;
+    }
+
+    async function loadProvinces() {
+      provinceSelect.innerHTML = "<option value=''>Đang tải tỉnh/thành...</option>";
+      provinceSelect.disabled = true;
+      wardSelect.innerHTML = "<option value=''>Chọn tỉnh/thành trước</option>";
+      wardSelect.disabled = true;
+      provinceInput.value = "";
+      provinceCodeInput.value = "";
+      wardInput.value = "";
+      wardCodeInput.value = "";
+
+      const cached = readCache(PROVINCES_CACHE_KEY);
+      if (cached && cached.length) {
+        renderProvinceOptions(cached);
+        provinceSelect.disabled = false;
+        prefetchWardsGradually(cached);
+        refreshProvincesInBackground();
+        return;
+      }
+
+      try {
+        const provinces = await fetchProvincesFast();
+        if (!provinces.length) throw new Error("No province data");
+        writeCache(PROVINCES_CACHE_KEY, provinces);
+        renderProvinceOptions(provinces);
+        prefetchWardsGradually(provinces);
+      } catch (err) {
+        try {
+          await swapHtmlInto("#provinceSelect", `${APPS_SCRIPT_URL}?mode=provinces`);
+        } catch (_) {
+          provinceSelect.innerHTML = "<option value=''>Không tải được dữ liệu tỉnh/thành</option>";
+        }
+      } finally {
+        provinceSelect.disabled = false;
+      }
+    }
+
+    async function loadWards(provinceCode) {
+      if (!provinceCode) {
+        wardSelect.innerHTML = "<option value=''>Chọn tỉnh/thành trước</option>";
+        wardSelect.disabled = true;
+        wardInput.value = "";
+        wardCodeInput.value = "";
+        return;
+      }
+      wardSelect.innerHTML = "<option value=''>Đang tải xã/phường...</option>";
+      wardSelect.disabled = true;
+      wardInput.value = "";
+      wardCodeInput.value = "";
+
+      const cacheKey = `${WARDS_CACHE_PREFIX}${provinceCode}`;
+      const cachedWards = readCache(cacheKey);
+      if (cachedWards && cachedWards.length) {
+        renderWardOptions(cachedWards);
+        wardSelect.disabled = false;
+        return;
+      }
+
+      try {
+        const wards = await fetchWardsFast(provinceCode);
+        if (!wards.length) throw new Error("No ward data");
+        writeCache(cacheKey, wards);
+        renderWardOptions(wards);
+      } catch (err) {
+        try {
+          await swapHtmlInto("#wardSelect", `${APPS_SCRIPT_URL}?mode=wards&provinceCode=${encodeURIComponent(provinceCode)}`);
+        } catch (_) {
+          wardSelect.innerHTML = "<option value=''>Không tải được dữ liệu xã/phường</option>";
+        }
+      } finally {
+        wardSelect.disabled = false;
+      }
+    }
+
+    function validateInputs() {
+      let ok = true;
+      let submitError = "";
+      setError("dobError", "");
+      setError("cccdError", "");
+      setError("emailError", "");
+      setError("phoneError", "");
+
+      const dob = dobInput.value.trim();
+      const cccd = cccdInput.value.trim();
+      const email = emailInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      const normalizedDob = normalizeDobFromTyping(dob);
+      if (!normalizedDob) {
+        setError("dobError", "Ngày sinh đúng định dạng dd/mm/yyyy và là ngày hợp lệ.");
+        ok = false;
+      } else {
+        dobInput.value = normalizedDob;
+        dobPickerInput.value = toDateInputValue(normalizedDob);
+      }
+      if (!cccdRegex.test(cccd)) {
+        setError("cccdError", "CCCD phải đủ 12 chữ số.");
+        ok = false;
+      }
+      if (!emailRegex.test(email)) {
+        setError("emailError", "Email không đúng định dạng.");
+        ok = false;
+      }
+      if (!phoneRegex.test(phone)) {
+        setError("phoneError", "SĐT hợp lệ: 0xxxxxxxxx hoặc +84xxxxxxxxx.");
+        ok = false;
+      }
+      if (!provinceCodeInput.value.trim() || !wardCodeInput.value.trim()) {
+        submitError = "Vui lòng chọn đúng Tỉnh/Thành phố và Xã/Phường từ danh sách.";
+        ok = false;
+      }
+      if (!ok) {
+        showAlert("error", "Dữ liệu chưa hợp lệ", submitError || "Vui lòng kiểm tra các trường đang báo đỏ.");
+      }
+      return ok;
+    }
+
+    toggleCccd.addEventListener("click", () => {
+      const hidden = cccdInput.type === "password";
+      cccdInput.type = hidden ? "text" : "password";
+      toggleCccd.textContent = hidden ? "Ẩn" : "Hiện";
+    });
+
+    emailInput.addEventListener("blur", () => {
+      setError("emailError", emailRegex.test(emailInput.value.trim()) ? "" : "Email không đúng định dạng.");
+    });
+    openDobPickerBtn.addEventListener("click", () => {
+      const isoValue = toDateInputValue(dobInput.value);
+      dobPickerInput.value = isoValue || "";
+      if (typeof dobPickerInput.showPicker === "function") {
+        dobPickerInput.showPicker();
+      } else {
+        dobPickerInput.focus();
+        dobPickerInput.click();
+      }
+    });
+    dobPickerInput.addEventListener("change", () => {
+      if (!dobPickerInput.value) return;
+      const normalized = toDdMmYyyy(dobPickerInput.value);
+      if (!normalized) return;
+      dobInput.value = normalized;
+      setError("dobError", "");
+      scheduleSaveDraftState();
+    });
+    dobInput.addEventListener("blur", () => {
+      const normalized = normalizeDobFromTyping(dobInput.value);
+      if (!dobInput.value.trim()) {
+        dobPickerInput.value = "";
+        setError("dobError", "");
+        return;
+      }
+      if (!normalized) {
+        setError("dobError", "Ngày sinh đúng định dạng dd/mm/yyyy và là ngày hợp lệ.");
+        return;
+      }
+      dobInput.value = normalized;
+      dobPickerInput.value = toDateInputValue(normalized);
+      setError("dobError", "");
+    });
+    phoneInput.addEventListener("blur", () => {
+      setError("phoneError", phoneRegex.test(phoneInput.value.trim()) ? "" : "SĐT hợp lệ: 0xxxxxxxxx hoặc +84xxxxxxxxx.");
+    });
+    cccdInput.addEventListener("blur", () => {
+      setError("cccdError", cccdRegex.test(cccdInput.value.trim()) ? "" : "CCCD phải đủ 12 chữ số.");
+    });
+    schoolNameInput.addEventListener("input", () => {
+      schoolSourceInput.value = "manual";
+      scheduleSaveDraftState();
+    });
+    competitionSelect.addEventListener("change", () => {
+      syncPaidAmountByCompetition();
+      updateBankQr();
+      scheduleSaveDraftState();
+    });
+    fullNameInput.addEventListener("input", () => {
+      updateBankQr();
+      scheduleSaveDraftState();
+    });
+    phoneInput.addEventListener("input", () => {
+      updateBankQr();
+      scheduleSaveDraftState();
+    });
+    paidAmountInput.addEventListener("input", () => {
+      updateBankQr();
+      scheduleSaveDraftState();
+    });
+    paymentRefInput.addEventListener("input", () => {
+      updateBankQr();
+      scheduleSaveDraftState();
+    });
+    feeStatusPaidInput.addEventListener("change", () => {
+      syncFeeStatusFromCheckbox();
+      scheduleSaveDraftState();
+    });
+    form.addEventListener("input", scheduleSaveDraftState);
+    form.addEventListener("change", scheduleSaveDraftState);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        saveDraftState();
+      }
+    });
+    window.addEventListener("pagehide", saveDraftState);
+
+    provinceSelect.addEventListener("change", async () => {
+      setProvinceHiddenFromSelect();
+      schoolSourceInput.value = "manual";
+      await loadWards(provinceCodeInput.value);
+      scheduleSaveDraftState();
+    });
+    wardSelect.addEventListener("change", () => {
+      setWardHiddenFromSelect();
+      schoolSourceInput.value = "manual";
+      scheduleSaveDraftState();
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      setFormMessage("", "");
+
+      if (APPS_SCRIPT_URL.includes("PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+        showAlert("error", "Chưa cấu hình", "Bạn chưa cấu hình APPS_SCRIPT_URL.");
+        return;
+      }
+
+      syncPaidAmountByCompetition();
+      syncFeeStatusFromCheckbox();
+      updateBankQr();
+      setProvinceHiddenFromSelect();
+      setWardHiddenFromSelect();
+
+      if (!form.reportValidity()) return;
+      if (!validateInputs()) return;
+
+      const payload = {
+        competition: document.getElementById("competition").value.trim(),
+        province: provinceInput.value.trim(),
+        provinceCode: provinceCodeInput.value.trim(),
+        ward: wardInput.value.trim(),
+        wardCode: wardCodeInput.value.trim(),
+        fullName: document.getElementById("fullName").value.trim(),
+        dob: normalizeDobFromTyping(dobInput.value),
+        schoolName: document.getElementById("schoolName").value.trim(),
+        schoolSource: schoolSourceInput.value.trim() || "manual",
+        examBlock: document.getElementById("examBlock").value.trim(),
+        studentClass: document.getElementById("studentClass").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        guardianPhone: document.getElementById("guardianPhone").value.trim(),
+        cccd: document.getElementById("cccd").value.trim(),
+        homeAddress: document.getElementById("homeAddress").value.trim(),
+        paidAmount: document.getElementById("paidAmount").value.trim(),
+        feeStatus: feeStatusInput.value.trim(),
+        paymentRef: document.getElementById("paymentRef").value.trim()
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Đang gửi...";
+
+      try {
+        const guardianEmailSnapshot = emailInput.value.trim();
+        const guardianPhoneSnapshot = phoneInput.value.trim();
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams(payload)
+        });
+        const text = await res.text();
+        let data = {};
+        try {
+          data = JSON.parse(text);
+        } catch (_) {
+          data = { status: "ok" };
+        }
+        if (data.status === "duplicate") {
+          showAlert("warning", "Hồ sơ đã tồn tại", data.message || "Hồ sơ này đã được đăng ký trước đó.");
+          return;
+        }
+        if (data.status === "invalid") {
+          const firstError = Array.isArray(data.errors) && data.errors.length ? data.errors[0] : "";
+          throw new Error(firstError || data.message || "Dữ liệu gửi lên không hợp lệ.");
+        }
+        if (data.status && data.status !== "ok") {
+          throw new Error(data.message || "Gửi thất bại.");
+        }
+        const successMessage = data.registrationId
+          ? `Đăng ký hoàn thành. Mã hồ sơ: ${data.registrationId}`
+          : "Đăng ký hoàn thành.";
+        showAlert("success", "Thành công", successMessage);
+        clearDraftAfterSubmitKeepGuardian(guardianEmailSnapshot, guardianPhoneSnapshot);
+        form.reset();
+        initClassOptions();
+        feeStatusPaidInput.checked = false;
+        syncFeeStatusFromCheckbox();
+        cccdInput.type = "password";
+        toggleCccd.textContent = "Hiện";
+        schoolSourceInput.value = "manual";
+        emailInput.value = guardianEmailSnapshot;
+        phoneInput.value = guardianPhoneSnapshot;
+        provinceSelect.innerHTML = "<option value=''>Đang tải tỉnh/thành...</option>";
+        wardSelect.innerHTML = "<option value=''>Chọn tỉnh/thành trước</option>";
+        wardSelect.disabled = true;
+        await loadProvinces();
+        syncPaidAmountByCompetition();
+        updateBankQr();
+        saveDraftState();
+      } catch (err) {
+        const rawMsg = String(err && err.message ? err.message : "");
+        const networkLike = /failed to fetch|networkerror|network request failed/i.test(rawMsg);
+        const msg = networkLike
+          ? "Không kết nối được Apps Script. Kiểm tra lại URL deploy, quyền truy cập Web App (Anyone), và redeploy version mới."
+          : (rawMsg || "Lỗi hệ thống. Vui lòng liên hệ BTC qua Zalo OA hoặc các trang thông tin!");
+        showAlert("error", "Không thể gửi đăng ký", msg);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Gửi đăng ký";
+      }
+    });
+
+    async function bootstrapForm() {
+      initClassOptions();
+      dobPickerInput.max = new Date().toISOString().slice(0, 10);
+      await loadProvinces();
+      syncPaidAmountByCompetition();
+      syncFeeStatusFromCheckbox();
+      updateBankQr();
+      await restoreDraftState();
+      warmUpAppsScript();
+    }
+
+    bootstrapForm();
+  </script>
+</body>
+</html>
