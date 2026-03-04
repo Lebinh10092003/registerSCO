@@ -540,6 +540,10 @@
           <p class="section-title">Liên hệ và lệ phí</p>
           <div class="grid two">
             <div>
+              <label for="guardianName">Họ tên phụ huynh/người giám hộ</label>
+              <input id="guardianName" name="guardianName" type="text" required>
+            </div>
+            <div>
               <label for="email">Email phụ huynh/thí sinh</label>
               <input id="email" name="email" type="email" required>
               <div class="error" id="emailError"></div>
@@ -608,6 +612,7 @@
     const formMessage = document.getElementById("formMessage");
     const competitionSelect = document.getElementById("competition");
     const cccdInput = document.getElementById("cccd");
+    const guardianNameInput = document.getElementById("guardianName");
     const emailInput = document.getElementById("email");
     const phoneInput = document.getElementById("guardianPhone");
     const fullNameInput = document.getElementById("fullName");
@@ -832,11 +837,13 @@
       return data && data.draft ? data.draft : null;
     }
 
-    function saveGuardianPrefill(emailValue = emailInput.value, phoneValue = phoneInput.value) {
+    function saveGuardianPrefill(nameValue = guardianNameInput.value, emailValue = emailInput.value, phoneValue = phoneInput.value) {
+      const guardianName = String(nameValue || "").trim();
       const email = String(emailValue || "").trim();
       const guardianPhone = String(phoneValue || "").trim();
-      if (!email && !guardianPhone) return;
+      if (!guardianName && !email && !guardianPhone) return;
       writeStorageObject(GUARDIAN_PREFILL_KEY, {
+        guardianName,
         email,
         guardianPhone
       });
@@ -846,6 +853,7 @@
       const data = readStorageObject(GUARDIAN_PREFILL_KEY, DRAFT_TTL_MS);
       if (!data) return null;
       return {
+        guardianName: String(data.guardianName || "").trim(),
         email: String(data.email || "").trim(),
         guardianPhone: String(data.guardianPhone || "").trim()
       };
@@ -867,6 +875,7 @@
         ward: wardInput.value,
         schoolName: schoolNameInput.value,
         schoolSource: schoolSourceInput.value || "manual",
+        guardianName: guardianNameInput.value,
         email: emailInput.value,
         guardianPhone: phoneInput.value,
         feeStatus: feeStatusInput.value,
@@ -909,6 +918,7 @@
         document.getElementById("homeAddress").value = draft.homeAddress || "";
         schoolNameInput.value = draft.schoolName || "";
         schoolSourceInput.value = draft.schoolSource || "manual";
+        guardianNameInput.value = draft.guardianName || "";
         emailInput.value = draft.email || "";
         phoneInput.value = draft.guardianPhone || "";
         feeStatusInput.value = draft.feeStatus || "Chưa nộp";
@@ -930,6 +940,7 @@
           if (!wardInput.value && draft.ward) wardInput.value = draft.ward;
         }
       } else if (fallbackGuardian) {
+        guardianNameInput.value = fallbackGuardian.guardianName || "";
         emailInput.value = fallbackGuardian.email || "";
         phoneInput.value = fallbackGuardian.guardianPhone || "";
       }
@@ -938,11 +949,11 @@
       saveDraftState();
     }
 
-    function clearDraftAfterSubmitKeepGuardian(emailValue, phoneValue) {
+    function clearDraftAfterSubmitKeepGuardian(nameValue, emailValue, phoneValue) {
       try {
         localStorage.removeItem(FORM_DRAFT_KEY);
       } catch (_) {}
-      saveGuardianPrefill(emailValue, phoneValue);
+      saveGuardianPrefill(nameValue, emailValue, phoneValue);
     }
 
     function escHtml(value) {
@@ -1359,6 +1370,7 @@
         schoolSource: schoolSourceInput.value.trim() || "manual",
         examBlock: document.getElementById("examBlock").value.trim(),
         studentClass: document.getElementById("studentClass").value.trim(),
+        guardianName: guardianNameInput.value.trim(),
         email: document.getElementById("email").value.trim(),
         guardianPhone: document.getElementById("guardianPhone").value.trim(),
         cccd: document.getElementById("cccd").value.trim(),
@@ -1372,6 +1384,7 @@
       submitBtn.textContent = "Đang gửi...";
 
       try {
+        const guardianNameSnapshot = guardianNameInput.value.trim();
         const guardianEmailSnapshot = emailInput.value.trim();
         const guardianPhoneSnapshot = phoneInput.value.trim();
         const submitController = new AbortController();
@@ -1408,7 +1421,7 @@
           ? `Đăng ký hoàn thành. Mã hồ sơ: ${data.registrationId}`
           : "Đăng ký hoàn thành.";
         showAlert("success", "Thành công", successMessage);
-        clearDraftAfterSubmitKeepGuardian(guardianEmailSnapshot, guardianPhoneSnapshot);
+        clearDraftAfterSubmitKeepGuardian(guardianNameSnapshot, guardianEmailSnapshot, guardianPhoneSnapshot);
         form.reset();
         initClassOptions();
         feeStatusPaidInput.checked = false;
@@ -1416,6 +1429,7 @@
         cccdInput.type = "password";
         toggleCccd.textContent = "Hiện";
         schoolSourceInput.value = "manual";
+        guardianNameInput.value = guardianNameSnapshot;
         emailInput.value = guardianEmailSnapshot;
         phoneInput.value = guardianPhoneSnapshot;
         provinceSelect.innerHTML = "<option value=''>Đang tải tỉnh/thành...</option>";
